@@ -12,6 +12,7 @@ components:
   - fastq_align_bwamem2
   - bam_variant_calling_sort_freebayes_bcftools
   - bcftools/filter
+  - bcftools/norm
   - bcftools/stats
   - consensus_bcftools
   - seqtk/comp
@@ -86,12 +87,6 @@ output:
         Channel containing seqtk stats files
         Structure: [ val(meta), path(consensus) ]
       pattern: "*.tsv"
-  - versions:
-      type: file
-      description: |
-        File containing software versions
-        Structure: [ path(versions.yml) ]
-      pattern: "versions.yml"
 authors:
   - "@avantonder"
 maintainers:

@@ -1,0 +1,48 @@
+name: read_stats_parse
+description: Creates a summary of quality statistics for a set of samples based on the outputs from read_stats
+keywords:
+  - FASTQ
+  - quality
+  - statistics
+input:
+  - - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+    - csv:
+        type: file
+        description: |
+          The input channel containing the read_stats output files in CSV format
+        pattern: "*.fa"
+output:
+  tsv:
+    type: file
+    description: |
+      Summary of quality statistics for the samples in TSV format
+    pattern: "*.tsv"
+  versions_read_stats_parse:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - read_stats_parse:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - read_stats_parse:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@avantonder"
+maintainers:
+  - "@avantonder"

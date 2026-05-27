@@ -1,0 +1,47 @@
+name: fasta_rename
+description: Renames the header in a FASTA file to the filename (without extension)
+keywords:
+  - fasta
+  - rename
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - fasta:
+      type: file
+      description: |
+        FASTA file containing the genome assembly to be renamed
+      pattern: "*.{fa,fasta}"
+output:
+  fasta:
+    type: file
+    description: |
+      Renamed FASTA file containing the genome assembly with updated headers
+    pattern: "*.fa"
+  versions_fasta_rename:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - fasta_rename:
+          type: string
+          description: The name of the tool
+      - "echo (sed --version 2>&1) | sed 's/^.*GNU sed) //; s/ .*//')":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - fasta_rename:
+          type: string
+          description: The name of the tool
+      - "echo (sed --version 2>&1) | sed 's/^.*GNU sed) //; s/ .*//')":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@hpatel"
+maintainers:
+  - "@avantonder"

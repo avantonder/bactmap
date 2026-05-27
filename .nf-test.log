@@ -1,0 +1,46 @@
+May-01 16:39:58.112 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.5
+May-01 16:39:58.121 [main] INFO  com.askimed.nf.test.App - Arguments: [test, tests/, --profile=+docker]
+May-01 16:39:58.564 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 26.04.0
+May-01 16:39:58.564 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /Users/ajv37/Documents/Pipelines/bactmap/nf-test.config...
+May-01 16:39:59.021 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 77 files from directory /Users/ajv37/Documents/Pipelines/bactmap in 0.209 sec
+May-01 16:39:59.022 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 1 files containing tests.
+May-01 16:39:59.022 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found files: [/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test]
+May-01 16:39:59.077 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Found 1 tests to execute.
+May-01 16:39:59.078 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
+May-01 16:39:59.078 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test pipeline' from file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test'.
+May-01 16:39:59.078 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '5192f88d: -profile test'. type: com.askimed.nf.test.lang.pipeline.PipelineTest
+May-01 16:40:51.781 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Init new snapshot file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
+May-01 16:40:51.782 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot '-profile test' not found.
+May-01 16:40:51.782 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot '-profile test'
+May-01 16:40:51.879 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
+May-01 16:40:51.880 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Test '5192f88d: -profile test' finished. status: FAILED
+org.codehaus.groovy.runtime.powerassert.PowerAssertionError: 1 of 2 assertions failed
+	at com.askimed.nf.test.lang.extensions.GlobalMethods.assertAll(GlobalMethods.java:47)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:321)
+	at default_nf$_run_closure1$_closure2$_closure4.doCall(default.nf.test:20)
+	at default_nf$_run_closure1$_closure2$_closure4.doCall(default.nf.test)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:343)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:328)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:280)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1009)
+	at groovy.lang.Closure.call(Closure.java:433)
+	at groovy.lang.Closure.call(Closure.java:412)
+	at com.askimed.nf.test.lang.TestCode.execute(TestCode.java:16)
+	at com.askimed.nf.test.lang.pipeline.PipelineTest.execute(PipelineTest.java:135)
+	at com.askimed.nf.test.core.TestExecutionEngine.execute(TestExecutionEngine.java:172)
+	at com.askimed.nf.test.commands.RunTestsCommand.execute(RunTestsCommand.java:322)
+	at com.askimed.nf.test.commands.AbstractCommand.call(AbstractCommand.java:43)
+	at com.askimed.nf.test.commands.AbstractCommand.call(AbstractCommand.java:18)
+	at picocli.CommandLine.executeUserObject(CommandLine.java:1953)
+	at picocli.CommandLine.access$1300(CommandLine.java:145)
+	at picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2352)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2346)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2311)
+	at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2179)
+	at picocli.CommandLine.execute(CommandLine.java:2078)
+	at com.askimed.nf.test.App.run(App.java:39)
+	at com.askimed.nf.test.App.main(App.java:46)
+May-01 16:40:51.882 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Testsuite 'Test pipeline' finished. snapshot file: true, skipped tests: false, failed tests: true
+May-01 16:40:51.882 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Executed 1 tests. 1 tests failed. Done!

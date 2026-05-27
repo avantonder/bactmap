@@ -1,0 +1,47 @@
+name: seqtk_parse
+description: Creates a summary of mapping statistics for a set of samples based on the output from seqtk
+keywords:
+  - mapping
+  - statistics
+input:
+  - - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+    - tsv:
+        type: file
+        description: |
+          The input channel containing the seqtk output files in TSV format
+        pattern: "*.fa"
+output:
+  tsv:
+    type: file
+    description: |
+      Summary of mapping statistics for the samples in TSV format
+    pattern: "*.tsv"
+  versions_seqtk_parse:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - seqtk_parse:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - seqtk_parse:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@avantonder"
+maintainers:
+  - "@avantonder"

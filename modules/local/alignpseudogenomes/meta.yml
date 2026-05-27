@@ -1,0 +1,59 @@
+name: alignpseudogenomes
+description: Creates a multiple sequence alignment of pseudogenomes for a set of samples
+keywords:
+  - pseudogenome
+  - MSA
+  - reference
+input:
+  - - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+    - pseudogenomes:
+        type: file
+        description: |
+          The input channel containing the consensus FASTA files
+          Structure: [ path(fasta) ]
+        pattern: "*.fa"
+    - reference:
+        type: file
+        description: |
+          Reference genome FASTA file to use as the basis for the MSA
+        pattern: "*.{fa,fasta}"
+output:
+  aligned_pseudogenomes:
+    type: file
+    description: |
+      Multiple sequence alignment of the pseudogenomes in FASTA format
+    pattern: "*.fas"
+  low_quality_metrics:
+    type: file
+    description: |
+      TSV file containing metrics for any samples that were flagged as low quality during the MSA process
+    pattern: "*.tsv"
+  versions_alignpseudogenomes:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - alignpseudogenomes:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - alignpseudogenomes:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@antunderwood"
+maintainers:
+  - "@avantonder"

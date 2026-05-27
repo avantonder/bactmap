@@ -10,27 +10,24 @@ include { FALCO as FALCO_PROCESSED   } from '../../../modules/nf-core/falco/main
 
 workflow SHORTREAD_PREPROCESSING {
     take:
-    reads //  [ [ meta ], [ reads ] ]
-    adapterlist // file
+    ch_reads       // [ [ meta ], [ reads ] ]
+    ch_adapterlist // file
 
     main:
-    ch_versions      = channel.empty()
     ch_multiqc_files = channel.empty()
 
     if (params.shortread_qc_tool == "fastp") {
-        SHORTREAD_FASTP(reads, adapterlist)
+        SHORTREAD_FASTP(ch_reads, ch_adapterlist)
         ch_processed_reads = SHORTREAD_FASTP.out.reads
-        ch_versions = ch_versions.mix(SHORTREAD_FASTP.out.versions)
         ch_multiqc_files = ch_multiqc_files.mix(SHORTREAD_FASTP.out.mqc)
     }
     else if (params.shortread_qc_tool == "adapterremoval") {
-        SHORTREAD_ADAPTERREMOVAL(reads, adapterlist)
+        SHORTREAD_ADAPTERREMOVAL(ch_reads, ch_adapterlist)
         ch_processed_reads = SHORTREAD_ADAPTERREMOVAL.out.reads
-        ch_versions = ch_versions.mix(SHORTREAD_ADAPTERREMOVAL.out.versions)
         ch_multiqc_files = ch_multiqc_files.mix(SHORTREAD_ADAPTERREMOVAL.out.mqc)
     }
     else {
-        ch_processed_reads = reads
+        ch_processed_reads = ch_reads
     }
 
     if (params.preprocessing_qc_tool == 'fastqc') {
@@ -39,12 +36,10 @@ workflow SHORTREAD_PREPROCESSING {
     }
     else if (params.preprocessing_qc_tool == 'falco') {
         FALCO_PROCESSED(ch_processed_reads)
-        ch_versions = ch_versions.mix(FALCO_PROCESSED.out.versions)
         ch_multiqc_files = ch_multiqc_files.mix(FALCO_PROCESSED.out.txt)
     }
 
     emit:
     reads    = ch_processed_reads // channel: [ val(meta), [ reads ] ]
-    versions = ch_versions        // channel: [ versions.yml ]
     mqc      = ch_multiqc_files
 }

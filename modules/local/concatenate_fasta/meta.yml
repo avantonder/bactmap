@@ -1,0 +1,47 @@
+name: concatenate_fasta
+description: Concatenates multiple-contigs in a FASTA file into a single contig
+keywords:
+  - reference
+  - concatenate
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reference:
+      type: file
+      description: |
+        FASTA file containing the reference genome with multiple contigs to be concatenated
+      pattern: "*.{fa,fasta}"
+output:
+  fasta:
+    type: file
+    description: |
+      Concatenated FASTA file containing the reference genome with all contigs joined
+    pattern: "*.fa"
+  versions_concatenate_fasta:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - concatenate_fasta:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - concatenate_fasta:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@antunderwood"
+maintainers:
+  - "@avantonder"

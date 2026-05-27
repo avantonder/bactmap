@@ -1,52 +1,40 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
-name: "shortread_adapterremoval"
-description: Create consensus FASTA from a VCF file
+name: shortread_adapterremoval
+description: Remove adapters from (Illumina) short-read sequencing data with AdapterRemoval
 keywords:
-  - adapters
-  - removal
-  - fastq
+  - adapter removal
+  - preprocessing
+  - short reads
 components:
   - adapterremoval
   - cat/fastq
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  - ch_reads:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
-  - adapterlist:
+        Short-read sequencing reads from typically Illumina sequencers in FASTQ format.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - ch_adapterlist:
       type: file
       description: |
-        List of adapters to remove from the reads.
-        Structure: [ path(adapterlist) ]
-      pattern: "*.txt"
+        Optional file containing list of adapters to remove.
+        Structure: [ val(meta), path(custom_adapters) ]
+      pattern: "*"
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
   - reads:
       type: file
       description: |
-        Channel containing adapter removed FASTQ files
+        Adapter removed and processed reads
         Structure: [ val(meta), path(reads) ]
       pattern: "*.fastq.gz"
-  - versions:
+  - mqc:
       type: file
       description: |
-        File containing software versions
-        Structure: [ path(versions.yml) ]
-      pattern: "versions.yml"
+        Log files for MultiQC
+        Structure: [ path(files) ]
+      pattern: "*"
 authors:
   - "@jfy133"
-  - "@sofstam"
-  - "@Midnighter"
-  - "@LilyAnderssonLee"
 maintainers:
-  - "@avantonder"
+  - "@jfy133"

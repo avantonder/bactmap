@@ -2,21 +2,20 @@ process ALIGNPSEUDOGENOMES {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/biopython:1.78' :
-        'quay.io/biocontainers/biopython:1.78' }"
+    container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+        ? 'https://depot.galaxyproject.org/singularity/biopython:1.78'
+        : 'quay.io/biocontainers/biopython:1.78' }"
 
     input:
     path pseudogenomes
     tuple val(ref_meta), path(fasta)
 
     output:
-    tuple env(NUM_ALIGNMENT_GENOMES), path("aligned_pseudogenomes.fas"), emit: aligned_pseudogenomes
-    path "low_quality_pseudogenomes.tsv",                                emit: low_quality_metrics
-    path  "versions.yml",                                                emit: versions
+    path("aligned_pseudogenomes.fas"), emit: aligned_pseudogenomes
+    path "low_quality_pseudogenomes.tsv", emit: low_quality_metrics
+    tuple val("${task.process}"), val('python'), eval("python --version | sed 's/Python //g'"), topic: versions
 
     script: // This script is bundled with the pipeline, in nf-core/bactmap/bin/
-    def aligner_version = '1.0'
     """
     touch low_quality_pseudogenomes.tsv
     touch aligned_pseudogenomes.fas
@@ -31,12 +30,10 @@ process ALIGNPSEUDOGENOMES {
     done
     multi2single_sequence.py -r ${fasta} -o final_reference.fas
     cat final_reference.fas >> aligned_pseudogenomes.fas
+    """
 
-    NUM_ALIGNMENT_GENOMES=\$(grep -c ">" aligned_pseudogenomes.fas)
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        multi2single_sequence.py: ${aligner_version}
-    END_VERSIONS
+    stub:
+    """
+    touch aligned_pseudogenomes.fas
     """
 }

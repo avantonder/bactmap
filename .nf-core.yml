@@ -1,11 +1,5 @@
 repository_type: pipeline
-nf_core_version: 3.5.2
-lint:
-  files_exist:
-    - .github/workflows/linting_comment.yml
-  files_unchanged:
-    - .github/workflows/branch.yml
-    - .github/workflows/linting.yml
+nf_core_version: 4.0.2
 template:
   org: nf-core
   name: bactmap

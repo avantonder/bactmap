@@ -14,7 +14,6 @@ include { samplesheetToList         } from 'plugin/nf-schema'
 include { paramsHelp                } from 'plugin/nf-schema'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
-include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 
@@ -30,9 +29,9 @@ workflow PIPELINE_INITIALISATION {
     version           // boolean: Display version and exit
     validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
     monochrome_logs   // boolean: Do not use coloured log outputs
-    nextflow_cli_args //   array: List of positional nextflow CLI args
-    outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
+    nextflow_cli_args // array: List of positional nextflow CLI args
+    outdir            // string: The output directory where the results will be saved
+    input             // string: Path to input samplesheet
     help              // boolean: Display help message and exit
     help_full         // boolean: Show the full help message
     show_hidden       // boolean: Show hidden parameters in the help message
@@ -69,7 +68,7 @@ workflow PIPELINE_INITIALISATION {
     https://doi.org/10.1038/s41587-020-0439-x
 
 * Software dependencies
-    https://github.com/nf-core/taxprofiler/blob/master/CITATIONS.md
+    https://github.com/nf-core/bactmap/blob/master/CITATIONS.md
 """
     command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>"
 
@@ -82,7 +81,8 @@ workflow PIPELINE_INITIALISATION {
         show_hidden,
         before_text,
         after_text,
-        command
+        command,
+        null
     )
 
     //
@@ -105,6 +105,24 @@ workflow PIPELINE_INITIALISATION {
         .fromList(samplesheetToList(params.input, "assets/schema_input.json"))
         .set { ch_samplesheet }
 
+    // Preprocessing
+    if (params.shortread_qc_includeunmerged && !params.shortread_qc_mergepairs) {
+        error("ERROR: [nf-core/bactmap] cannot include unmerged reads when merging is not turned on. Please specify --shortread_qc_mergepairs")
+    }
+
+    if (params.shortread_qc_adapterlist) {
+        def adapterlist = file(params.shortread_qc_adapterlist, checkIfExists: true)
+        if (params.shortread_qc_tool == 'adapterremoval' && !(adapterlist.extension == 'txt')) {
+            error("[nf-core/bactmap] ERROR: AdapterRemoval2 adapter list requires a `.txt` format and extension. Check input: --shortread_qc_adapterlist ${params.shortread_qc_adapterlist}")
+        }
+        if (params.shortread_qc_tool == 'fastp' && !adapterlist.extension.matches(".*(fa|fasta|fna|fas)")) {
+            error("[nf-core/bactmap] ERROR: fastp adapter list requires a `.fasta` format and extension (or fa, fas, fna). Check input: --shortread_qc_adapterlist ${params.shortread_qc_adapterlist}")
+        }
+    }
+
+    if (params.shortread_complexityfilter_tool == 'fastp' && (params.perform_shortread_qc == false || params.shortread_qc_tool != 'fastp')) {
+        error("ERROR: [nf-core/bactmap] cannot use fastp complexity filtering if preprocessing not turned on and/or tool is not fastp. Please specify --perform_shortread_qc and/or --shortread_qc_tool 'fastp'")
+    }
 
     emit:
     samplesheet = ch_samplesheet
@@ -149,9 +167,6 @@ workflow PIPELINE_COMPLETION {
         }
 
         completionSummary(monochrome_logs)
-        if (hook_url) {
-            imNotification(summary_params, hook_url)
-        }
     }
 
     workflow.onError {
@@ -184,18 +199,6 @@ def validateInputSamplesheet(input) {
     }
 
     return [ metas[0], fastqs ]
-}
-
-//
-// Get attribute from genome config file e.g. fasta
-//
-def getGenomeAttribute(attribute) {
-    if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-        if (params.genomes[ params.genome ].containsKey(attribute)) {
-            return params.genomes[ params.genome ][ attribute ]
-        }
-    }
-    return null
 }
 
 //

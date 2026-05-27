@@ -18,8 +18,6 @@ workflow CONSENSUS_BCFTOOLS {
     ch_fasta        // channel: /path/to/genome.fasta
 
     main:
-    ch_versions = channel.empty()
-
     //
     // Filter variants by allele frequency, zip and index
     //
@@ -44,7 +42,6 @@ workflow CONSENSUS_BCFTOOLS {
     BEDTOOLS_GENOMECOV (
         ch_genomecov.genomecov
     )
-    ch_versions = ch_versions.mix(BEDTOOLS_GENOMECOV.out.versions.first())
 
     //
     // Make the bed mask
@@ -65,7 +62,6 @@ workflow CONSENSUS_BCFTOOLS {
         ch_consensus,
         ch_fasta
     )
-    ch_versions = ch_versions.mix(BCFTOOLS_CONSENSUS.out.versions.first())
 
     //
     // Rename consensus header adding sample name
@@ -73,15 +69,11 @@ workflow CONSENSUS_BCFTOOLS {
     RENAME_FASTA_HEADER (
         BCFTOOLS_CONSENSUS.out.fasta
     )
-    ch_versions = ch_versions.mix(RENAME_FASTA_HEADER.out.versions.first())
 
     CONCATENATE_FASTA (
         RENAME_FASTA_HEADER.out.fasta
     )
-    ch_versions = ch_versions.mix(RENAME_FASTA_HEADER.out.versions.first())
-
 
     emit:
     consensus = CONCATENATE_FASTA.out.fasta // channel: [ val(meta), [ fasta ] ]
-    versions  = ch_versions                 // channel: [ versions.yml ]
 }

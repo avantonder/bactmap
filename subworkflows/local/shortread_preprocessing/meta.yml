@@ -1,54 +1,44 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
-name: "shortread_preprocessing"
-description: Perform filtering and adapter removal of long read FASTQ files
+name: shortread_preprocessing
+description: Subworkflow for sequencing read QC, adapter removal, and quality filtering of short reads
 keywords:
+  - qc
+  - adapter removal
+  - quality filtering
   - preprocessing
-  - cleaning
-  - fastq
+  - short reads
 components:
-  - shortread_fastp
   - shortread_adapterremoval
+  - shortread_fastp
   - fastqc
   - falco
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  - ch_reads:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
-  - adapterlist:
+        Short-read sequencing reads from typically Illumina sequencers in FASTQ format.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq.gz,fastq,fq.gz,fq}"
+  - ch_adapterlist:
       type: file
       description: |
-        List of adapters to remove from the reads.
-        Structure: [ path(adapterlist) ]
-      pattern: "*.txt"
+        Optional file containing list of adapters to remove.
+        Structure: [ val(meta), path(custom_adapters) ]
+      pattern: "*"
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
   - reads:
       type: file
       description: |
-        Channel containing cleaned FASTQ files
+        Adapter removed and processed reads
         Structure: [ val(meta), path(reads) ]
       pattern: "*.fastq.gz"
-  - versions:
+  - mqc:
       type: file
       description: |
-        File containing software versions
-        Structure: [ path(versions.yml) ]
-      pattern: "versions.yml"
+        Log files for MultiQC
+        Structure: [ path(files) ]
+      pattern: "*"
 authors:
   - "@jfy133"
-  - "@sofstam"
-  - "@Midnighter"
-  - "@LilyAnderssonLee"
 maintainers:
-  - "@avantonder"
+  - "@jfy133"

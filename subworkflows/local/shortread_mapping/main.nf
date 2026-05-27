@@ -14,30 +14,28 @@ include { SEQTK_COMP                                  } from '../../../modules/n
 workflow SHORTREAD_MAPPING {
 
     take:
-    reads    // channel: [ val(meta), [ reads ] ]
+    ch_reads  // channel: [ val(meta), [ reads ] ]
     ch_fasta // channel: [meta, ref]
     ch_index // channel: [meta, ref index]
     ch_faidx // channel: [meta, ref fai]
 
     main:
-    ch_versions      = channel.empty()
     ch_multiqc_files = channel.empty()
 
     if (params.shortread_mapping_tool == 'bowtie2') {
         FASTQ_ALIGN_BOWTIE2 (
-            reads,
+            ch_reads,
             ch_index,
             false,
             false,
             ch_fasta
         )
         ch_bam           = FASTQ_ALIGN_BOWTIE2.out.bam
-        ch_bam_index     = FASTQ_ALIGN_BOWTIE2.out.bai
+        ch_bam_index     = FASTQ_ALIGN_BOWTIE2.out.index
         ch_multiqc_files = ch_multiqc_files.mix( FASTQ_ALIGN_BOWTIE2.out.stats )
-        ch_versions      = ch_versions.mix( FASTQ_ALIGN_BOWTIE2.out.versions )
     } else {
         FASTQ_ALIGN_BWAMEM2 (
-            reads,
+            ch_reads,
             ch_index,
             ch_fasta,
             false
@@ -45,7 +43,6 @@ workflow SHORTREAD_MAPPING {
         ch_bam           = FASTQ_ALIGN_BWAMEM2.out.bam
         ch_bam_index     = FASTQ_ALIGN_BWAMEM2.out.bai
         ch_multiqc_files = ch_multiqc_files.mix( FASTQ_ALIGN_BWAMEM2.out.stats )
-        ch_versions      = ch_versions.mix( FASTQ_ALIGN_BWAMEM2.out.versions )
     }
 
     // Prepare inputs for FreeBayes
@@ -64,7 +61,6 @@ workflow SHORTREAD_MAPPING {
                         [ [:], [] ],
                         [ [:], [] ]
     )
-    ch_versions = ch_versions.mix(BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.versions)
 
     ch_bcftool_filter_input = BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.vcf
         .join(BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.tbi)
@@ -80,7 +76,6 @@ workflow SHORTREAD_MAPPING {
     ch_multiqc_files = ch_multiqc_files.mix( BCFTOOLS_STATS.out.stats )
 
     CONSENSUS_BCFTOOLS ( ch_bam, BCFTOOLS_NORM.out.vcf, BCFTOOLS_NORM.out.tbi, ch_fasta )
-    ch_versions = ch_versions.mix( CONSENSUS_BCFTOOLS.out.versions )
 
     SEQTK_COMP( CONSENSUS_BCFTOOLS.out.consensus )
 
@@ -93,6 +88,5 @@ workflow SHORTREAD_MAPPING {
     stats       = BCFTOOLS_STATS.out.stats         // channel: [meta, stats]
     consensus   = CONSENSUS_BCFTOOLS.out.consensus // channel: [ val(meta), path(consensus) ]
     seqtk_stats = SEQTK_COMP.out.seqtk_stats       // channel: [meta, stats]
-    versions    = ch_versions                      // channel: [ versions.yml ]
     mqc         = ch_multiqc_files                 // channel: [ val(meta), [ multiqc files ] ]
 }

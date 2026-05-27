@@ -18,9 +18,9 @@ tools:
       documentation: "https://github.com/HKU-BAL/Clair3"
       tool_dev_url: "https://github.com/HKU-BAL/Clair3"
       doi: "10.1038/s43588-022-00387-x"
-      licence: ["BSD-3-clause"]
+      licence:
+        - "BSD-3-clause"
       identifier: biotools:clair3
-
 input:
   - - meta:
         type: map
@@ -39,13 +39,19 @@ input:
         type: file
         description: BAM index file
         pattern: "*.bai"
-    - model:
+        ontologies: []
+    - packaged_model:
+        type: string
+        description: string containing the name of a prepackaged Clair3 model full
+          list of models and their descriptions is provided at
+          https://github.com/HKU-BAL/Clair3?tab=readme-ov-file#pre-trained-models
+    - user_model:
         type: directory
-        description: collection of files used in a trained Clair3 model
+        description: directory containing Clair3 model files
     - platform:
         type: string
-        description: val in ['hifi','ont', 'ilmn'] to indicate pacbio, ONT, or illumina
-          respectively
+        description: val in ['hifi','ont', 'ilmn'] to indicate pacbio, ONT, or
+          illumina respectively
   - - meta2:
         type: map
         description: |
@@ -55,6 +61,7 @@ input:
         type: file
         description: reference fasta file
         pattern: "*.fasta"
+        ontologies: []
   - - meta3:
         type: map
         description: |
@@ -64,55 +71,102 @@ input:
         type: file
         description: reference index file
         pattern: "*.fai"
+        ontologies: []
 output:
-  - vcf:
-      - meta:
+  vcf:
+    - - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. `[ id:'sample1' ]`
           pattern: "*.{vcf,vcf.gz}"
-      - "*merge_output.vcf.gz":
+      - ${prefix}merge_output.vcf.gz:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. `[ id:'sample1' ]`
           pattern: "*.{vcf,vcf.gz}"
-  - tbi:
-      - meta:
+  tbi:
+    - - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. `[ id:'sample1' ]`
-      - "*merge_output.vcf.gz.tbi":
+          pattern: "*.{vcf,vcf.gz}"
+      - ${prefix}merge_output.vcf.gz.tbi:
           type: file
           description: index for vcf files
           pattern: "*.{vcf.tbi,vcf.tbi.gz}"
-  - phased_vcf:
-      - meta:
+          ontologies: []
+  phased_vcf:
+    - - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. `[ id:'sample1' ]`
-      - "*phased_merge_output.vcf.gz":
+          pattern: "*.{vcf,vcf.gz}"
+      - ${prefix}phased_merge_output.vcf.gz:
           type: file
           description: phased vcf
           pattern: "*.{vcf,vcf.gz}"
-  - phased_tbi:
-      - meta:
+          ontologies: []
+  phased_tbi:
+    - - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. `[ id:'sample1' ]`
-      - "*phased_merge_output.vcf.gz.tbi":
+          pattern: "*.{vcf,vcf.gz}"
+      - ${prefix}phased_merge_output.vcf.gz.tbi:
           type: file
           description: index for vcf files
           pattern: "*.{vcf.tbi,vcf.tbi.gz}"
-  - versions:
-      - versions.yml:
+          ontologies: []
+  gvcf:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+          pattern: "*.{vcf,vcf.gz}"
+      - ${prefix}merge_output.gvcf.gz:
           type: file
-          description: File containing software versions
-          pattern: "versions.yml"
+          description: gvcf file
+          pattern: "*.{gvcf,gvcf.gz}"
+          ontologies: []
+  gtbi:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+          pattern: "*.{vcf,vcf.gz}"
+      - ${prefix}merge_output.gvcf.gz.tbi:
+          type: file
+          description: index for gvcf file
+          pattern: "*.{vcf.tbi,vcf.tbi.gz}"
+          ontologies: []
+  versions_clair3:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - clair3:
+          type: string
+          description: The name of the tool
+      - run_clair3.sh --version | sed "s/^Clair3 v//":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - clair3:
+          type: string
+          description: The name of the tool
+      - run_clair3.sh --version | sed "s/^Clair3 v//":
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@robert-a-forsyth"
 maintainers:

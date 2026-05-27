@@ -1,0 +1,48 @@
+name: read_stats
+description: Converts the output from fastq-scan into a format that can be parsed by read_stats_parse
+keywords:
+  - FASTQ
+  - quality
+  - statistics
+input:
+  - - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+    - json:
+        type: file
+        description: |
+          The input channel containing the read_stats output files in JSON format
+        pattern: "*.json"
+output:
+  csv:
+    type: file
+    description: |
+      Summary of quality statistics for the samples in CSV format
+    pattern: "*.csv"
+  versions_read_stats:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - read_stats:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - read_stats:
+          type: string
+          description: The name of the tool
+      - "python --version | sed 's/Python //g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@avantonder"
+maintainers:
+  - "@avantonder"
