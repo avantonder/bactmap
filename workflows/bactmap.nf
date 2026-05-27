@@ -132,7 +132,8 @@ workflow BACTMAP {
     */
 
     if (params.shortread_mapping_tool == 'bowtie2') {
-        ch_index = BOWTIE2_BUILD ( ch_fasta ).index
+        ch_index = BOWTIE2_BUILD ( ch_fasta.map { item -> [ [:], item ] } ).index
+        //ch_index = BOWTIE2_BUILD ( ch_fasta ).index
     } else {
         ch_index = BWAMEM2_INDEX ( ch_fasta ).index
     }
