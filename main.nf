@@ -18,7 +18,6 @@
 include { BACTMAP                 } from './workflows/bactmap'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_bactmap_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_bactmap_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_bactmap_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,8 +25,6 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_bact
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
 params.fasta = getGenomeAttribute('fasta')
 
 /*
@@ -46,19 +43,16 @@ workflow NFCORE_BACTMAP {
 
     main:
 
-    if(params.fasta){
-        ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true).collect()
-            .map{ it -> [[id:it[0].getSimpleName()], it[0]]}
-    } else {
-        exit 1, 'Either a valid configured `genome` or a `fasta` file must be specified.'
-    }
-
     //
     // WORKFLOW: Run pipeline
     //
     BACTMAP (
         samplesheet,
-        ch_fasta
+        params.fasta,
+        params.multiqc_config,
+        params.multiqc_logo,
+        params.multiqc_methods_description,
+        params.outdir
     )
     emit:
     multiqc_report = BACTMAP.out.multiqc_report // channel: /path/to/multiqc_report.html
@@ -105,6 +99,24 @@ workflow {
         params.hook_url,
         NFCORE_BACTMAP.out.multiqc_report
     )
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    FUNCTIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+//
+// Get attribute from genome config file e.g. fasta
+//
+def getGenomeAttribute(attribute) {
+    if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
+        if (params.genomes[ params.genome ].containsKey(attribute)) {
+            return params.genomes[ params.genome ][ attribute ]
+        }
+    }
+    return null
 }
 
 /*

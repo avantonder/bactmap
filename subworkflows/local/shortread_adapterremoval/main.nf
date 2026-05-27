@@ -8,20 +8,19 @@ include { CAT_FASTQ                               } from '../../../modules/nf-co
 
 workflow SHORTREAD_ADAPTERREMOVAL {
     take:
-    reads       // [[meta], [reads]]
-    adapterlist // file
+    ch_reads       // [[meta], [reads]]
+    ch_adapterlist // file
 
     main:
-    ch_versions      = channel.empty()
     ch_multiqc_files = channel.empty()
 
-    ch_input_for_adapterremoval = reads.branch {
+    ch_input_for_adapterremoval = ch_reads.branch {
         single: it[0].single_end
         paired: !it[0].single_end
     }
 
-    ADAPTERREMOVAL_SINGLE(ch_input_for_adapterremoval.single, adapterlist)
-    ADAPTERREMOVAL_PAIRED(ch_input_for_adapterremoval.paired, adapterlist)
+    ADAPTERREMOVAL_SINGLE(ch_input_for_adapterremoval.single, ch_adapterlist)
+    ADAPTERREMOVAL_PAIRED(ch_input_for_adapterremoval.paired, ch_adapterlist)
 
     /*
      * Due to the ~slightly~ very ugly output implementation of the current AdapterRemoval2 version, each file
@@ -72,9 +71,6 @@ workflow SHORTREAD_ADAPTERREMOVAL {
         ch_adapterremoval_reads_prepped = ADAPTERREMOVAL_PAIRED.out.paired_truncated.mix(ADAPTERREMOVAL_SINGLE.out.singles_truncated)
     }
 
-    ch_versions = ch_versions.mix(ADAPTERREMOVAL_SINGLE.out.versions.first())
-    ch_versions = ch_versions.mix(ADAPTERREMOVAL_PAIRED.out.versions.first())
-
     ch_multiqc_files = ch_multiqc_files.mix(
         ADAPTERREMOVAL_PAIRED.out.settings,
         ADAPTERREMOVAL_SINGLE.out.settings,
@@ -82,6 +78,5 @@ workflow SHORTREAD_ADAPTERREMOVAL {
 
     emit:
     reads    = ch_adapterremoval_reads_prepped // channel: [ val(meta), [ reads ] ]
-    versions = ch_versions // channel: [ versions.yml ]
     mqc      = ch_multiqc_files
 }

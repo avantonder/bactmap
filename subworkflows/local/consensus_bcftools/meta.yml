@@ -54,12 +54,6 @@ output:
         Channel containing consensus FASTA files
         Structure: [ val(meta), path(fasta) ]
       pattern: "*.fa"
-  - versions:
-      type: file
-      description: |
-        File containing software versions
-        Structure: [ path(versions.yml) ]
-      pattern: "versions.yml"
 authors:
   - "@MareikeJaniak"
   - "@sgsutcliffe"

@@ -1,0 +1,47 @@
+name: get_genome_size
+description: Extracts the total genome size from SAMtools faidx output
+keywords:
+  - fasta
+  - size
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - size_file:
+      type: file
+      description: |
+        File containing the output from SAMtools faidx with genome size information
+      pattern: "*.{fa,fasta}"
+output:
+  fasta:
+    type: file
+    description: |
+      Renamed FASTA file containing the genome assembly with updated headers
+    pattern: "*.sizes"
+  versions_get_genome_size:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - get_genome_size:
+          type: string
+          description: The name of the tool
+      - "awk -version | sed '1!d; s/.*awk version//; s/,.*//'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - get_genome_size:
+          type: string
+          description: The name of the tool
+      - "awk -version | sed '1!d; s/.*awk version//; s/,.*//'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@project-defiant"
+maintainers:
+  - "@avantonder"

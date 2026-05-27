@@ -41,12 +41,6 @@ output:
         Channel containing indexed BAM (BAI) files
         Structure: [ val(meta), path(bai) ]
       pattern: "*.bai"
-  - versions:
-      type: file
-      description: |
-        Channel containing software versions
-        Structure: [ path(versions.yml) ]
-      pattern: "versions.yml"
 authors:
   - "@opetryk"
 maintainers:

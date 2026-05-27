@@ -10,31 +10,30 @@ include { LONGREAD_FILTERING         } from '../longread_filtering/main'
 
 workflow LONGREAD_PREPROCESSING {
     take:
-    reads
+    ch_reads
+    ch_custom_adapters
 
     main:
     ch_versions      = channel.empty()
     ch_multiqc_files = channel.empty()
 
     if (!params.longread_qc_skipadaptertrim && params.longread_qc_skipqualityfilter) {
-        LONGREAD_ADAPTERREMOVAL(reads)
+        LONGREAD_ADAPTERREMOVAL(ch_reads, ch_custom_adapters)
         ch_processed_reads = LONGREAD_ADAPTERREMOVAL.out.reads
         ch_versions = ch_versions.mix(LONGREAD_ADAPTERREMOVAL.out.versions.first())
         ch_multiqc_files = ch_multiqc_files.mix(LONGREAD_ADAPTERREMOVAL.out.mqc)
     }
     else if (params.longread_qc_skipadaptertrim && !params.longread_qc_skipqualityfilter) {
-        LONGREAD_FILTERING(reads)
+        LONGREAD_FILTERING(ch_reads)
         ch_processed_reads = LONGREAD_FILTERING.out.reads
-        ch_versions = ch_versions.mix(LONGREAD_FILTERING.out.versions.first())
         ch_multiqc_files = ch_multiqc_files.mix(LONGREAD_FILTERING.out.mqc)
     }
     else {
-        LONGREAD_ADAPTERREMOVAL(reads)
+        LONGREAD_ADAPTERREMOVAL(ch_reads, ch_custom_adapters)
         ch_clipped_reads = LONGREAD_ADAPTERREMOVAL.out.reads.map { meta, clipped_long_reads -> [meta + [single_end: true], clipped_long_reads] }
         LONGREAD_FILTERING(ch_clipped_reads)
         ch_processed_reads = LONGREAD_FILTERING.out.reads
         ch_versions = ch_versions.mix(LONGREAD_ADAPTERREMOVAL.out.versions.first())
-        ch_versions = ch_versions.mix(LONGREAD_FILTERING.out.versions.first())
         ch_multiqc_files = ch_multiqc_files.mix(LONGREAD_ADAPTERREMOVAL.out.mqc)
         ch_multiqc_files = ch_multiqc_files.mix(LONGREAD_FILTERING.out.mqc)
     }
@@ -45,7 +44,6 @@ workflow LONGREAD_PREPROCESSING {
     }
     else if (params.preprocessing_qc_tool == 'falco') {
         FALCO_PROCESSED(ch_processed_reads)
-        ch_versions = ch_versions.mix(FALCO_PROCESSED.out.versions)
         ch_multiqc_files = ch_multiqc_files.mix(FALCO_PROCESSED.out.txt)
     }
 

@@ -359,7 +359,7 @@
                 },
                 "longread_adapterremoval_tool": {
                     "type": "string",
-                    "default": "porechop",
+                    "default": "porechop_abi",
                     "description": "Specify which tool to use for adapter trimming.",
                     "enum": ["porechop", "porechop_abi"],
                     "help_text": "The performance of Porechop and Porechop_ABI is same in terms of removing adapter reads. However Porechop is no longer updated, Porechop_ABI receives regular updates.",
@@ -370,6 +370,14 @@
                     "description": "Skip long-read trimming",
                     "fa_icon": "fas fa-forward",
                     "help_text": "Skip removal of adapters by Porechop. This can be useful in some cases to speed up run time - particularly when you are running data downloading from public databases such as the ENA/SRA that should already have adapters removed. We recommend that you check your FastQC results this is indeed the case."
+                },
+                "longread_qc_adapterlist": {
+                    "type": "string",
+                    "description": "Path to a custom adapter text file, if you want to manually specify a list of adapters to remove.",
+                    "help_text": "Requires disabling default adapters from the Porechop database.",
+                    "fa_icon": "fas fa-file-alt",
+                    "format": "file-path",
+                    "mimetype": "text"
                 },
                 "longread_filter_tool": {
                     "type": "string",
@@ -534,7 +542,7 @@
                 },
                 "genomecov_scale": {
                     "type": "string",
-                    "default": 1,
+                    "default": "1",
                     "description": "Scale the coverage by a constant factor",
                     "help_text": "Each coverage value is multiplied by this factor before being reported. Useful for normalizing coverage by, e.g., reads per million (RPM). Default is 1.0 i.e. unscaled.",
                     "fa_icon": "fas fa-balance-scale-left"

@@ -13,11 +13,8 @@ workflow BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS {
 
     main:
 
-    ch_versions = channel.empty()
-
     // Variant calling
     FREEBAYES ( ch_input, ch_fasta_fai.map{ meta, fasta, fai -> [ meta, fasta ] }, ch_fasta_fai.map{ meta, fasta, fai -> [ meta, fai ] }, ch_samples, ch_populations, ch_cnv )
-    ch_versions = ch_versions.mix(FREEBAYES.out.versions.first())
 
     // Sort VCF files
     BCFTOOLS_SORT ( FREEBAYES.out.vcf )
@@ -29,6 +26,4 @@ workflow BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS {
     vcf      = BCFTOOLS_SORT.out.vcf           // channel: [ val(meta), path(vcf) ]
     csi      = BCFTOOLS_INDEX.out.csi          // channel: [ val(meta), path(csi) ]
     tbi      = BCFTOOLS_INDEX.out.tbi          // channel: [ val(meta), path(tbi) ]
-
-    versions = ch_versions                     // channel: [ path(versions.yml) ]
 }
