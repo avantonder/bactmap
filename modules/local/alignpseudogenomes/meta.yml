@@ -4,41 +4,54 @@ keywords:
   - pseudogenome
   - MSA
   - reference
-input:
-  - - meta:
-      type: map
+  - alignment
+tools:
+  - biopython:
       description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-    - pseudogenomes:
+        Biopython is a set of freely available tools for biological computation
+        written in Python.
+      homepage: https://biopython.org/
+      documentation: https://biopython.org/wiki/Documentation
+      licence: ["BSD-3-Clause"]
+      identifier: ""
+input:
+  - - pseudogenomes:
         type: file
         description: |
-          The input channel containing the consensus FASTA files
-          Structure: [ path(fasta) ]
+          Consensus FASTA files for each sample to be aligned
         pattern: "*.fa"
-    - reference:
+        ontologies: []
+  - - ref_meta:
+        type: map
+        description: |
+          Groovy Map containing reference information
+          e.g. [ id:'reference' ]
+    - fasta:
         type: file
         description: |
           Reference genome FASTA file to use as the basis for the MSA
         pattern: "*.{fa,fasta}"
+        ontologies: []
 output:
   aligned_pseudogenomes:
-    type: file
-    description: |
-      Multiple sequence alignment of the pseudogenomes in FASTA format
-    pattern: "*.fas"
+    - - "aligned_pseudogenomes.fas":
+          type: file
+          description: Multiple sequence alignment of pseudogenomes in FASTA format
+          pattern: "*.fas"
+          ontologies: []
   low_quality_metrics:
-    type: file
-    description: |
-      TSV file containing metrics for any samples that were flagged as low quality during the MSA process
-    pattern: "*.tsv"
+    - - "low_quality_pseudogenomes.tsv":
+          type: file
+          description: TSV file containing metrics for samples flagged as low quality
+          pattern: "*.tsv"
+          ontologies: []
   versions_alignpseudogenomes:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - alignpseudogenomes:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -46,10 +59,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - alignpseudogenomes:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool

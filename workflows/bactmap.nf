@@ -121,6 +121,10 @@ workflow BACTMAP {
     SAMTOOLS_FAIDX(ch_fasta.map { item -> [ [:], item, [] ] }, true )
     sizes = SAMTOOLS_FAIDX.out.sizes
 
+    // Construct a reference fasta channel with empty meta for downstream subworkflows
+    // Note: SAMTOOLS_FAIDX.out.fa only emits for .fa/.fasta extensions, so we use ch_fasta directly
+    ch_fasta_meta = ch_fasta.map { item -> [ [:], item ] }
+
     /*
         MODULE: Get genome size
     */
@@ -133,9 +137,8 @@ workflow BACTMAP {
 
     if (params.shortread_mapping_tool == 'bowtie2') {
         ch_index = BOWTIE2_BUILD ( ch_fasta.map { item -> [ [:], item ] } ).index
-        //ch_index = BOWTIE2_BUILD ( ch_fasta ).index
     } else {
-        ch_index = BWAMEM2_INDEX ( ch_fasta ).index
+        ch_index = BWAMEM2_INDEX ( ch_fasta.map { item -> [ [:], item ] } ).index
     }
 
     /*
@@ -203,8 +206,6 @@ workflow BACTMAP {
     ch_fastqscanprocessed_fastqscanparse = FASTQSCAN_PROCESSED.out.json
         .map { it[1] }
         .collect()
-
-    ch_fastqscanprocessed_readstats = FASTQSCAN_PROCESSED.out.json
 
     /*
         MODULE: Run fastqscanparse
@@ -276,11 +277,7 @@ workflow BACTMAP {
     */
     if ( params.perform_subsampling ) {
         ch_input_for_rasusa = ch_reads_runmerged
-            .join( genome_size )
-            .map {
-                meta, reads ->
-                [ meta, reads, genome_size ]
-            }
+            .combine( genome_size )
         ch_reads_subsampled = RASUSA( ch_input_for_rasusa, params.subsampling_depth_cutoff ).reads
     } else {
         ch_reads_subsampled = ch_reads_runmerged
@@ -298,7 +295,7 @@ workflow BACTMAP {
     */
     SHORTREAD_MAPPING (
         ch_mapping_input.fastq,
-        SAMTOOLS_FAIDX.out.fa,
+        ch_fasta_meta,
         ch_index,
         SAMTOOLS_FAIDX.out.fai
     )
@@ -307,7 +304,7 @@ workflow BACTMAP {
         MODULE: Map long-reads
     */
     LONGREAD_MAPPING (
-        SAMTOOLS_FAIDX.out.fa,
+        ch_fasta_meta,
         SAMTOOLS_FAIDX.out.fai,
         ch_mapping_input.nanopore
     )
@@ -321,7 +318,6 @@ workflow BACTMAP {
     SEQTK_PARSE (
         ch_seqtk_seqtkparse.map { tsv -> tsv[1] }.collect()
     )
-    ch_seqtk_metadata = SEQTK_PARSE.out.tsv
 
     /*
         MODULE: Align pseudogenomes
@@ -331,22 +327,27 @@ workflow BACTMAP {
 
     ALIGNPSEUDOGENOMES (
         ch_align_pseudogenomes.map { consensus -> consensus[1] }.collect(),
-        ch_fasta
+        ch_fasta_meta
     )
 
     ALIGNPSEUDOGENOMES.out.aligned_pseudogenomes
-        .branch {
-            aligned_pseudogenomes ->
-            ALIGNMENT_NUM_PASS: aligned_pseudogenomes[0].toInteger() >= 4
-            ALIGNMENT_NUM_FAIL: aligned_pseudogenomes[0].toInteger() < 4
+        .map { fasta_file ->
+            def count = fasta_file.text.count('>')
+            [count, fasta_file]
+        }
+        .branch { count, _fasta_file ->
+            ALIGNMENT_NUM_PASS: count >= 4
+            ALIGNMENT_NUM_FAIL: true
         }
         .set { aligned_pseudogenomes_branch }
 
-    // Don't proceeed further if two few genonmes
-    aligned_pseudogenomes_branch.ALIGNMENT_NUM_FAIL.view { "Insufficient (${it[0]}) genomes after filtering to continue. Check results/pseudogenomes/low_quality_pseudogenomes.tsv for details"}
+    // Don't proceed further if too few genomes
+    aligned_pseudogenomes_branch.ALIGNMENT_NUM_FAIL.view { count, _fasta ->
+        "Insufficient (${count}) genomes after filtering to continue. Check results/pseudogenomes/low_quality_pseudogenomes.tsv for details"
+    }
 
     aligned_pseudogenomes_branch.ALIGNMENT_NUM_PASS
-        .map{ it[1] }
+        .map { _count, fasta_file -> fasta_file }
         .set { aligned_pseudogenomes }
 
     SNPSITES(

@@ -1,32 +1,49 @@
 name: seqtk_parse
-description: Creates a summary of mapping statistics for a set of samples based on the output from seqtk
+description: Creates a summary of mapping statistics for a set of samples based on
+  the output from seqtk
 keywords:
   - mapping
   - statistics
-input:
-  - - meta:
-      type: map
+  - summary
+  - seqtk
+tools:
+  - python:
       description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-    - tsv:
+        Python is a programming language that lets you work quickly and integrate
+        systems more effectively.
+      homepage: https://www.python.org/
+      documentation: https://docs.python.org/3/
+      licence: ["PSF-2.0"]
+      identifier: ""
+  - pandas:
+      description: |
+        pandas is a fast, powerful, flexible and easy to use open source data
+        analysis and manipulation tool built on top of Python.
+      homepage: https://pandas.pydata.org/
+      documentation: https://pandas.pydata.org/docs/
+      licence: ["BSD-3-Clause"]
+      identifier: ""
+input:
+  - - tsv:
         type: file
         description: |
-          The input channel containing the seqtk output files in TSV format
-        pattern: "*.fa"
+          Per-sample mapping statistics TSV files from seqtk comp
+        pattern: "*.tsv"
+        ontologies: []
 output:
   tsv:
-    type: file
-    description: |
-      Summary of mapping statistics for the samples in TSV format
-    pattern: "*.tsv"
+    - - "mapping_summary.tsv":
+          type: file
+          description: Summary of mapping statistics for all samples in TSV format
+          pattern: "*.tsv"
+          ontologies: []
   versions_seqtk_parse:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - seqtk_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -34,10 +51,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - seqtk_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool

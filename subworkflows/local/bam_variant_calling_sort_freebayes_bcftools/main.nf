@@ -24,6 +24,5 @@ workflow BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS {
 
     emit:
     vcf      = BCFTOOLS_SORT.out.vcf           // channel: [ val(meta), path(vcf) ]
-    csi      = BCFTOOLS_INDEX.out.csi          // channel: [ val(meta), path(csi) ]
-    tbi      = BCFTOOLS_INDEX.out.tbi          // channel: [ val(meta), path(tbi) ]
+    index    = BCFTOOLS_INDEX.out.index        // channel: [ val(meta), path(index) ]
 }

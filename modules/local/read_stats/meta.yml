@@ -1,33 +1,64 @@
 name: read_stats
-description: Converts the output from fastq-scan into a format that can be parsed by read_stats_parse
+description: Converts the output from fastq-scan into per-sample read statistics in CSV format
 keywords:
   - FASTQ
   - quality
   - statistics
+  - reads
+tools:
+  - python:
+      description: |
+        Python is a programming language that lets you work quickly and integrate
+        systems more effectively.
+      homepage: https://www.python.org/
+      documentation: https://docs.python.org/3/
+      licence: ["PSF-2.0"]
+      identifier: ""
+  - pandas:
+      description: |
+        pandas is a fast, powerful, flexible and easy to use open source data
+        analysis and manipulation tool built on top of Python.
+      homepage: https://pandas.pydata.org/
+      documentation: https://pandas.pydata.org/docs/
+      licence: ["BSD-3-Clause"]
+      identifier: ""
 input:
   - - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-    - json:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', single_end:false ]
+    - pre_json:
         type: file
         description: |
-          The input channel containing the read_stats output files in JSON format
+          fastq-scan JSON output for reads before preprocessing
         pattern: "*.json"
+        ontologies: []
+    - post_json:
+        type: file
+        description: |
+          fastq-scan JSON output for reads after preprocessing
+        pattern: "*.json"
+        ontologies: []
 output:
   csv:
-    type: file
-    description: |
-      Summary of quality statistics for the samples in CSV format
-    pattern: "*.csv"
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+      - "*.read_stats.csv":
+          type: file
+          description: Per-sample read statistics in CSV format
+          pattern: "*.read_stats.csv"
+          ontologies: []
   versions_read_stats:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - read_stats:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -35,10 +66,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - read_stats:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool

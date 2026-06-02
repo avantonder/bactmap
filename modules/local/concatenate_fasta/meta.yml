@@ -1,32 +1,49 @@
 name: concatenate_fasta
-description: Concatenates multiple-contigs in a FASTA file into a single contig
+description: Concatenates multiple contigs in a FASTA file into a single contig
 keywords:
+  - fasta
   - reference
   - concatenate
+tools:
+  - biopython:
+      description: |
+        Biopython is a set of freely available tools for biological computation
+        written in Python.
+      homepage: https://biopython.org/
+      documentation: https://biopython.org/wiki/Documentation
+      licence: ["BSD-3-Clause"]
+      identifier: ""
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reference:
-      type: file
-      description: |
-        FASTA file containing the reference genome with multiple contigs to be concatenated
-      pattern: "*.{fa,fasta}"
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', single_end:false ]
+    - fasta:
+        type: file
+        description: |
+          FASTA file containing the reference genome with multiple contigs to be concatenated
+        pattern: "*.{fa,fasta}"
+        ontologies: []
 output:
   fasta:
-    type: file
-    description: |
-      Concatenated FASTA file containing the reference genome with all contigs joined
-    pattern: "*.fa"
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+      - "*.fa":
+          type: file
+          description: Concatenated FASTA file with all contigs joined into a single sequence
+          pattern: "*.fa"
+          ontologies: []
   versions_concatenate_fasta:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - concatenate_fasta:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -34,10 +51,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - concatenate_fasta:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool

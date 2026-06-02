@@ -12,7 +12,7 @@ process RENAME_FASTA_HEADER {
 
     output:
     tuple val(meta), path("*.fa"), emit: fasta
-    tuple val("${task.process}"), val('sed'), eval("sed: \$(echo \$(sed --version 2>&1) | sed 's/^.*GNU sed) //; s/ .*\$//')"), topic: versions, emit: versions_rename_fasta_header
+    tuple val("${task.process}"), val('sed'), eval("sed --version | head -1 | awk '{print \$NF}'"), topic: versions, emit: versions_rename_fasta_header
 
     when:
     task.ext.when == null || task.ext.when
