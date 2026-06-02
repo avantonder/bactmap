@@ -1,13 +1,15 @@
 name: bcftools_consensus
-description: Compresses VCF files
+description: Create consensus sequence by applying VCF variants to a reference FASTA file
 keywords:
   - variant calling
   - consensus
   - VCF
+  - bcftools
 tools:
-  - consensus:
+  - bcftools:
       description: |
-        Create consensus sequence by applying VCF variants to a reference fasta file.
+        BCFtools is a set of utilities that manipulate variant calls in the
+        Variant Call Format (VCF) and its binary counterpart BCF.
       homepage: http://samtools.github.io/bcftools/bcftools.html
       documentation: http://www.htslib.org/doc/bcftools.html
       doi: 10.1093/bioinformatics/btp352
@@ -21,31 +23,62 @@ input:
           e.g. [ id:'test', single_end:false ]
     - vcf:
         type: file
-        description: VCF file
-        pattern: "*.{vcf}"
+        description: VCF file containing variants to apply
+        pattern: "*.{vcf,vcf.gz}"
+        ontologies: []
     - tbi:
         type: file
-        description: tabix index file
+        description: Tabix index file for the VCF
         pattern: "*.{tbi}"
+        ontologies: []
+    - mask:
+        type: file
+        description: BED file used for masking low coverage regions
+        pattern: "*.{bed}"
+        ontologies: []
+  - - ref_meta:
+        type: map
+        description: |
+          Groovy Map containing reference information
+          e.g. [ id:'reference' ]
     - fasta:
         type: file
         description: FASTA reference file
         pattern: "*.{fasta,fa}"
-    - mask:
-        type: file
-        description: BED file used for masking
-        pattern: "*.{bed}"
+        ontologies: []
 output:
-  - fasta:
-      - meta:
+  fasta:
+    - - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. [ id:'test', single_end:false ]
       - "*.fa":
           type: file
-          description: FASTA reference consensus file
-          pattern: "*.{fasta,fa}"
+          description: Consensus FASTA file with variants applied
+          pattern: "*.fa"
+          ontologies: []
+  versions_bcftools:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - bcftools:
+          type: string
+          description: The tool name
+      - "bcftools --version | sed '1!d; s/^.*bcftools //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - bcftools:
+          type: string
+          description: The tool name
+      - "bcftools --version | sed '1!d; s/^.*bcftools //'":
+          type: eval
+          description: The expression to obtain the version of the tool
 authors:
   - "@joseespinosa"
   - "@drpatelh"

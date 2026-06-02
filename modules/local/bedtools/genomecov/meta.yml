@@ -1,16 +1,18 @@
 name: bedtools_genomecov
-description: Computes histograms (default), per-base reports (-d) and BEDGRAPH (-bg)
-  summaries of feature coverage (e.g., aligned sequences) for a given genome.
+description: Computes per-base genome coverage from a BAM file and filters regions
+  below a coverage threshold
 keywords:
   - bed
   - bam
   - genomecov
   - bedtools
-  - histogram
+  - coverage
 tools:
   - bedtools:
       description: |
-        A set of tools for genomic analysis tasks, specifically enabling genome arithmetic (merge, count, complement) on various file types.
+        A set of tools for genomic analysis tasks, specifically enabling genome
+        arithmetic (merge, count, complement) on various file types.
+      homepage: https://bedtools.readthedocs.io/
       documentation: https://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
       licence: ["MIT"]
       identifier: biotools:bedtools
@@ -22,27 +24,14 @@ input:
           e.g. [ id:'test', single_end:false ]
     - intervals:
         type: file
-        description: BAM/BED/GFF/VCF
-        pattern: "*.{bam|bed|gff|vcf}"
+        description: BAM file to compute coverage from
+        pattern: "*.{bam}"
         ontologies: []
     - scale:
         type: integer
-        description: Number containing the scale factor for the output. Set to 1 to
-          disable. Setting to a value other than 1 will also get the -bg bedgraph output
-          format as this is required for this command switch
-  - sizes:
-      type: file
-      description: Tab-delimited table of chromosome names in the first column and chromosome
-        sizes in the second column
-      ontologies: []
-  - extension:
-      type: string
-      description: Extension of the output file (e. g., ".bg", ".bedgraph", ".txt",
-        ".tab", etc.) It is set arbitrarily by the user and corresponds to the file
-        format which depends on arguments.
-  - sort:
-      type: boolean
-      description: Sort the output
+        description: |
+          Scale factor for the output. Set to 1 to disable. Setting to a value
+          other than 1 will also enable -bg bedgraph output format.
 output:
   genomecov:
     - - meta:
@@ -50,18 +39,18 @@ output:
           description: |
             Groovy Map containing sample information
             e.g. [ id:'test', single_end:false ]
-      - "*.${extension}":
+      - "*.bed":
           type: file
-          description: Computed genome coverage file
-          pattern: "*.${extension}"
+          description: BED file of regions below the coverage threshold
+          pattern: "*.bed"
           ontologies: []
   versions_bedtools:
     - - ${task.process}:
           type: string
-          description: The name of the process
+          description: The process the versions were collected from
       - bedtools:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "bedtools --version | sed -e 's/bedtools v//g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -69,10 +58,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
+          description: The process the versions were collected from
       - bedtools:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "bedtools --version | sed -e 's/bedtools v//g'":
           type: eval
           description: The expression to obtain the version of the tool

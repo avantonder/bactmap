@@ -1,44 +1,60 @@
 name: fasta_rename
-description: Renames the header in a FASTA file to the filename (without extension)
+description: Renames the header in a FASTA file to the sample ID
 keywords:
   - fasta
   - rename
+  - sed
+tools:
+  - sed:
+      description: |
+        GNU sed is a stream editor for filtering and transforming text.
+      homepage: https://www.gnu.org/software/sed/
+      documentation: https://www.gnu.org/software/sed/manual/sed.html
+      licence: ["GPL-3.0-or-later"]
+      identifier: ""
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - fasta:
-      type: file
-      description: |
-        FASTA file containing the genome assembly to be renamed
-      pattern: "*.{fa,fasta}"
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', single_end:false ]
+    - fasta:
+        type: file
+        description: |
+          FASTA file containing the genome assembly to be renamed
+        pattern: "*.{fa,fasta}"
+        ontologies: []
 output:
   fasta:
-    type: file
-    description: |
-      Renamed FASTA file containing the genome assembly with updated headers
-    pattern: "*.fa"
-  versions_fasta_rename:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', single_end:false ]
+      - "*.fa":
+          type: file
+          description: Renamed FASTA file with headers prepended with the sample ID
+          pattern: "*.fa"
+          ontologies: []
+  versions_rename_fasta_header:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - fasta_rename:
+          description: The process the versions were collected from
+      - sed:
           type: string
-          description: The name of the tool
-      - "echo (sed --version 2>&1) | sed 's/^.*GNU sed) //; s/ .*//')":
+          description: The tool name
+      - "sed --version | head -1 | awk '{print $NF}'":
           type: eval
           description: The expression to obtain the version of the tool
 topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - fasta_rename:
+          description: The process the versions were collected from
+      - sed:
           type: string
-          description: The name of the tool
-      - "echo (sed --version 2>&1) | sed 's/^.*GNU sed) //; s/ .*//')":
+          description: The tool name
+      - "sed --version | head -1 | awk '{print $NF}'":
           type: eval
           description: The expression to obtain the version of the tool
 authors:

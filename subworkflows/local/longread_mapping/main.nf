@@ -41,18 +41,18 @@ workflow LONGREAD_MAPPING {
 
     BCFTOOLS_INDEX ( BCFTOOLS_SORT.out.vcf )
 
-    ch_bcftool_view_input = BCFTOOLS_SORT.out.vcf.join(BCFTOOLS_INDEX.out.tbi)
+    ch_bcftool_view_input = BCFTOOLS_SORT.out.vcf.join(BCFTOOLS_INDEX.out.index)
     BCFTOOLS_VIEW ( ch_bcftool_view_input, [], [], [] )
 
-    ch_bcftool_norm_input = BCFTOOLS_VIEW.out.vcf.join(BCFTOOLS_VIEW.out.tbi)
+    ch_bcftool_norm_input = BCFTOOLS_VIEW.out.vcf.join(BCFTOOLS_VIEW.out.index)
     BCFTOOLS_NORM ( ch_bcftool_norm_input, ch_fasta )
 
-    ch_bcftool_stats_input = BCFTOOLS_NORM.out.vcf.join(BCFTOOLS_NORM.out.tbi)
+    ch_bcftool_stats_input = BCFTOOLS_NORM.out.vcf.join(BCFTOOLS_NORM.out.index)
 
     BCFTOOLS_STATS ( ch_bcftool_stats_input, [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ] )
     ch_multiqc_files = ch_multiqc_files.mix( BCFTOOLS_STATS.out.stats )
 
-    CONSENSUS_BCFTOOLS ( BAM_SORT_STATS_SAMTOOLS.out.bam, BCFTOOLS_NORM.out.vcf, BCFTOOLS_NORM.out.tbi, ch_fasta )
+    CONSENSUS_BCFTOOLS ( BAM_SORT_STATS_SAMTOOLS.out.bam, BCFTOOLS_NORM.out.vcf, BCFTOOLS_NORM.out.index, ch_fasta )
 
     SEQTK_COMP( CONSENSUS_BCFTOOLS.out.consensus )
 
@@ -60,8 +60,7 @@ workflow LONGREAD_MAPPING {
     bam         = BAM_SORT_STATS_SAMTOOLS.out.bam   // channel: [ val(meta), [ bam ] ]
     index       = BAM_SORT_STATS_SAMTOOLS.out.index // channel: [ val(meta), [ index ] ]
     vcf         = BCFTOOLS_NORM.out.vcf             // channel: [meta, vcf]
-    csi         = BCFTOOLS_NORM.out.csi             // channel: [ val(meta), path(csi) ]
-    tbi         = BCFTOOLS_NORM.out.tbi             // channel; [meta, tbi]
+    norm_index  = BCFTOOLS_NORM.out.index           // channel: [ val(meta), path(index) ]
     stats       = BCFTOOLS_STATS.out.stats          // channel: [meta, stats]
     consensus   = CONSENSUS_BCFTOOLS.out.consensus  // channel: [ val(meta), path(consensus) ]
     seqtk_stats = SEQTK_COMP.out.seqtk_stats        // channel: [meta, stats]

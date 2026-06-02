@@ -1,33 +1,49 @@
 name: read_stats_parse
-description: Creates a summary of quality statistics for a set of samples based on the outputs from read_stats
+description: Creates a summary of quality statistics for a set of samples based on
+  the outputs from read_stats
 keywords:
   - FASTQ
   - quality
   - statistics
-input:
-  - - meta:
-      type: map
+  - summary
+tools:
+  - python:
       description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-    - csv:
+        Python is a programming language that lets you work quickly and integrate
+        systems more effectively.
+      homepage: https://www.python.org/
+      documentation: https://docs.python.org/3/
+      licence: ["PSF-2.0"]
+      identifier: ""
+  - pandas:
+      description: |
+        pandas is a fast, powerful, flexible and easy to use open source data
+        analysis and manipulation tool built on top of Python.
+      homepage: https://pandas.pydata.org/
+      documentation: https://pandas.pydata.org/docs/
+      licence: ["BSD-3-Clause"]
+      identifier: ""
+input:
+  - - csv:
         type: file
         description: |
-          The input channel containing the read_stats output files in CSV format
-        pattern: "*.fa"
+          Per-sample read statistics CSV files from the read_stats process
+        pattern: "*.csv"
+        ontologies: []
 output:
   tsv:
-    type: file
-    description: |
-      Summary of quality statistics for the samples in TSV format
-    pattern: "*.tsv"
+    - - "read_stats_summary.tsv":
+          type: file
+          description: Summary of quality statistics for all samples in TSV format
+          pattern: "*.tsv"
+          ontologies: []
   versions_read_stats_parse:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - read_stats_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -35,10 +51,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - read_stats_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool

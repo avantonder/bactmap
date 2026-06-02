@@ -22,13 +22,16 @@ workflow SHORTREAD_MAPPING {
     main:
     ch_multiqc_files = channel.empty()
 
+    // Combine fasta and fai into a single channel for subworkflows that need both
+    ch_fasta_fai = ch_fasta.join( ch_faidx ) // channel: [ val(meta), path(fasta), path(fai) ]
+
     if (params.shortread_mapping_tool == 'bowtie2') {
         FASTQ_ALIGN_BOWTIE2 (
             ch_reads,
             ch_index,
             false,
             false,
-            ch_fasta
+            ch_fasta_fai
         )
         ch_bam           = FASTQ_ALIGN_BOWTIE2.out.bam
         ch_bam_index     = FASTQ_ALIGN_BOWTIE2.out.index
@@ -37,17 +40,13 @@ workflow SHORTREAD_MAPPING {
         FASTQ_ALIGN_BWAMEM2 (
             ch_reads,
             ch_index,
-            ch_fasta,
+            ch_fasta_fai,
             false
         )
         ch_bam           = FASTQ_ALIGN_BWAMEM2.out.bam
         ch_bam_index     = FASTQ_ALIGN_BWAMEM2.out.bai
         ch_multiqc_files = ch_multiqc_files.mix( FASTQ_ALIGN_BWAMEM2.out.stats )
     }
-
-    // Prepare inputs for FreeBayes
-    ch_freebayes_fasta = ch_fasta // channel: [ val(meta), path(reference), path(fai)]
-        .join( ch_faidx )
 
     freebayes_input = ch_bam  // channel: [ val(meta), path(bam) ]
         .join( ch_bam_index ) // channel: [ val(meta), path(bam), path(bam_index)]
@@ -56,26 +55,26 @@ workflow SHORTREAD_MAPPING {
             }
 
     BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS (freebayes_input,
-                        ch_freebayes_fasta.first(),
+                        ch_fasta_fai.first(),
                         [ [:], [] ],
                         [ [:], [] ],
                         [ [:], [] ]
     )
 
     ch_bcftool_filter_input = BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.vcf
-        .join(BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.tbi)
+        .join(BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS.out.index)
 
     BCFTOOLS_FILTER ( ch_bcftool_filter_input )
 
-    ch_bcftool_norm_input = BCFTOOLS_FILTER.out.vcf.join(BCFTOOLS_FILTER.out.tbi)
+    ch_bcftool_norm_input = BCFTOOLS_FILTER.out.vcf.join(BCFTOOLS_FILTER.out.index)
     BCFTOOLS_NORM ( ch_bcftool_norm_input, ch_fasta )
 
-    ch_bcftool_stats_input = BCFTOOLS_NORM.out.vcf.join(BCFTOOLS_NORM.out.tbi)
+    ch_bcftool_stats_input = BCFTOOLS_NORM.out.vcf.join(BCFTOOLS_NORM.out.index)
 
     BCFTOOLS_STATS ( ch_bcftool_stats_input, [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ] )
     ch_multiqc_files = ch_multiqc_files.mix( BCFTOOLS_STATS.out.stats )
 
-    CONSENSUS_BCFTOOLS ( ch_bam, BCFTOOLS_NORM.out.vcf, BCFTOOLS_NORM.out.tbi, ch_fasta )
+    CONSENSUS_BCFTOOLS ( ch_bam, BCFTOOLS_NORM.out.vcf, BCFTOOLS_NORM.out.index, ch_fasta )
 
     SEQTK_COMP( CONSENSUS_BCFTOOLS.out.consensus )
 
@@ -83,8 +82,7 @@ workflow SHORTREAD_MAPPING {
     bam         = ch_bam                           // channel: [ val(meta), [ bam ] ]
     bai         = ch_index                         // channel: [ val(meta), [ bai ] ]
     vcf         = BCFTOOLS_NORM.out.vcf            // channel: [meta, vcf]
-    csi         = BCFTOOLS_NORM.out.csi            // channel: [ val(meta), path(csi) ]
-    tbi         = BCFTOOLS_NORM.out.tbi            // channel; [meta, tbi]
+    index       = BCFTOOLS_NORM.out.index          // channel: [ val(meta), path(index) ]
     stats       = BCFTOOLS_STATS.out.stats         // channel: [meta, stats]
     consensus   = CONSENSUS_BCFTOOLS.out.consensus // channel: [ val(meta), path(consensus) ]
     seqtk_stats = SEQTK_COMP.out.seqtk_stats       // channel: [meta, stats]

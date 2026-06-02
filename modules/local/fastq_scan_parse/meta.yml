@@ -1,33 +1,49 @@
 name: fastq_scan_parse
-description: Creates a summary of FASTQ quality statistics for a set of samples based on the output from fastq-scan
+description: Creates a summary of FASTQ quality statistics for a set of samples based
+  on the output from fastq-scan
 keywords:
   - FASTQ
   - quality
   - statistics
-input:
-  - - meta:
-      type: map
+  - summary
+tools:
+  - python:
       description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-    - json:
+        Python is a programming language that lets you work quickly and integrate
+        systems more effectively.
+      homepage: https://www.python.org/
+      documentation: https://docs.python.org/3/
+      licence: ["PSF-2.0"]
+      identifier: ""
+  - pandas:
+      description: |
+        pandas is a fast, powerful, flexible and easy to use open source data
+        analysis and manipulation tool built on top of Python.
+      homepage: https://pandas.pydata.org/
+      documentation: https://pandas.pydata.org/docs/
+      licence: ["BSD-3-Clause"]
+      identifier: ""
+input:
+  - - json:
         type: file
         description: |
-          The input channel containing the fastq-scan output files in JSON format
-        pattern: "*.fa"
+          fastq-scan output files in JSON format
+        pattern: "*.json"
+        ontologies: []
 output:
   tsv:
-    type: file
-    description: |
-      Summary of FASTQ quality statistics for the samples in TSV format
-    pattern: "*.tsv"
+    - - "*.tsv":
+          type: file
+          description: Summary of FASTQ quality statistics for all samples in TSV format
+          pattern: "*.tsv"
+          ontologies: []
   versions_fastq_scan_parse:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - fastq_scan_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
@@ -35,10 +51,10 @@ topics:
   versions:
     - - ${task.process}:
           type: string
-          description: The name of the process
-      - fastq_scan_parse:
+          description: The process the versions were collected from
+      - python:
           type: string
-          description: The name of the tool
+          description: The tool name
       - "python --version | sed 's/Python //g'":
           type: eval
           description: The expression to obtain the version of the tool
