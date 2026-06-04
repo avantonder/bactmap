@@ -23,9 +23,12 @@ workflow LONGREAD_MAPPING {
     main:
     ch_multiqc_files = channel.empty()
 
+    // Combine fasta and fai into a single channel for subworkflows that need both
+    ch_fasta_fai = ch_fasta.join( ch_faidx ) // channel: [ val(meta), path(fasta), path(fai) ]
+
     MINIMAP2_ALIGNMENT( ch_fasta, ch_reads )
 
-    BAM_SORT_STATS_SAMTOOLS ( MINIMAP2_ALIGNMENT.out.minimap_align,  ch_fasta )
+    BAM_SORT_STATS_SAMTOOLS ( MINIMAP2_ALIGNMENT.out.minimap_align,  ch_fasta_fai )
     ch_multiqc_files = ch_multiqc_files.mix( BAM_SORT_STATS_SAMTOOLS.out.stats )
 
     ch_clair3_input = BAM_SORT_STATS_SAMTOOLS.out.bam
