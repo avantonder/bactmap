@@ -305,6 +305,10 @@
                     "fa_icon": "fas fa-grip-lines",
                     "help_text": "Specify a custom forward or R1 adapter sequence to be removed from reads. \\n\\nIf not set, the selected short-read QC tool's defaults will be used.\\n\\n> Modifies tool parameter(s):\\n> - fastp: `--adapter_sequence`. fastp default: `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`\\n> - AdapterRemoval: `--adapter1`. AdapteRemoval2 default: `AGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG`"
                 },
+                "shortread_complexityfilter_tool": {
+                    "type": "string",
+                    "default": "fastp"
+                },
                 "shortread_qc_adapter2": {
                     "type": "string",
                     "description": "Specify adapter 2 nucleotide sequence",
