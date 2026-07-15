@@ -12,9 +12,7 @@ components:
   - bam_sort_stats_samtools
   - clair3
   - bcftools/sort
-  - bcftools/index
-  - bcftools/view
-  - bcftools/norm
+  - vcf_filter
   - bcftools/stats
   - consensus_bcftools
   - seqtk/comp

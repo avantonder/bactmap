@@ -11,8 +11,7 @@ components:
   - fastq_align_bowtie2
   - fastq_align_bwamem2
   - bam_variant_calling_sort_freebayes_bcftools
-  - bcftools/filter
-  - bcftools/norm
+  - vcf_filter
   - bcftools/stats
   - consensus_bcftools
   - seqtk/comp

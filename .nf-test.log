@@ -1,18 +1,18 @@
-Jun-02 16:16:50.002 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.5
-Jun-02 16:16:50.012 [main] INFO  com.askimed.nf.test.App - Arguments: [test, tests/, --profile=+docker, --update-snapshot]
-Jun-02 16:16:50.526 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 26.04.0
-Jun-02 16:16:50.526 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /Users/ajv37/Documents/Pipelines/bactmap/nf-test.config...
-Jun-02 16:16:51.076 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 72 files from directory /Users/ajv37/Documents/Pipelines/bactmap in 0.234 sec
-Jun-02 16:16:51.077 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 1 files containing tests.
-Jun-02 16:16:51.077 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found files: [/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test]
-Jun-02 16:16:51.173 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Found 1 tests to execute.
-Jun-02 16:16:51.173 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
-Jun-02 16:16:51.174 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test pipeline' from file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test'.
-Jun-02 16:16:51.174 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '5192f88d: -profile test'. type: com.askimed.nf.test.lang.pipeline.PipelineTest
-Jun-02 16:18:42.031 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Load snapshots from file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
-Jun-02 16:18:42.561 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshots '-profile test' do not match. Update snapshots flag set.
-Jun-02 16:18:42.561 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Updated snapshot '-profile test'
-Jun-02 16:18:43.254 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
-Jun-02 16:18:43.258 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Test '5192f88d: -profile test' finished. status: PASSED
-Jun-02 16:18:43.260 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Testsuite 'Test pipeline' finished. snapshot file: true, skipped tests: false, failed tests: false
-Jun-02 16:18:43.261 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Executed 1 tests. 0 tests failed. Done!
+Jul-15 16:20:44.220 [main] INFO  com.askimed.nf.test.App - nf-test 0.9.5
+Jul-15 16:20:44.229 [main] INFO  com.askimed.nf.test.App - Arguments: [test, tests/, --profile=+docker, --update-snapshot]
+Jul-15 16:20:44.759 [main] INFO  com.askimed.nf.test.App - Nextflow Version: 26.04.0
+Jul-15 16:20:44.760 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Load config from file /Users/ajv37/Documents/Pipelines/bactmap/nf-test.config...
+Jul-15 16:20:45.620 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Loaded 73 files from directory /Users/ajv37/Documents/Pipelines/bactmap in 0.185 sec
+Jul-15 16:20:45.621 [main] INFO  com.askimed.nf.test.lang.dependencies.DependencyResolver - Found 1 files containing tests.
+Jul-15 16:20:45.621 [main] DEBUG com.askimed.nf.test.lang.dependencies.DependencyResolver - Found files: [/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test]
+Jul-15 16:20:45.705 [main] INFO  com.askimed.nf.test.commands.RunTestsCommand - Found 1 tests to execute.
+Jul-15 16:20:45.705 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Started test plan
+Jul-15 16:20:45.705 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Running testsuite 'Test pipeline' from file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test'.
+Jul-15 16:20:45.706 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Run test '5192f88d: -profile test'. type: com.askimed.nf.test.lang.pipeline.PipelineTest
+Jul-15 16:22:54.422 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Init new snapshot file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
+Jul-15 16:22:54.424 [main] DEBUG com.askimed.nf.test.lang.extensions.Snapshot - Snapshot '-profile test' not found.
+Jul-15 16:22:54.424 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Created snapshot '-profile test'
+Jul-15 16:22:55.179 [main] DEBUG com.askimed.nf.test.lang.extensions.SnapshotFile - Wrote snapshots to file '/Users/ajv37/Documents/Pipelines/bactmap/tests/default.nf.test.snap'
+Jul-15 16:22:55.180 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Test '5192f88d: -profile test' finished. status: PASSED
+Jul-15 16:22:55.181 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Testsuite 'Test pipeline' finished. snapshot file: true, skipped tests: false, failed tests: false
+Jul-15 16:22:55.182 [main] INFO  com.askimed.nf.test.core.TestExecutionEngine - Executed 1 tests. 0 tests failed. Done!
