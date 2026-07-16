@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "vcf_filter"
+description: Perform post-processing and filtering of VCF files including normalization, indel removal, quality filtering, depth filtering, and mixed site filtering
+keywords:
+  - vcf
+  - filter
+  - normalization
+  - variant calling
+  - bcftools
+components:
+  - bcftools/view
+  - bcftools/norm
+  - bcftools/filter
+  - bcftools/pluginfilltags
+  - bcftools/sort
+input:
+  - ch_vcf:
+      type: file
+      description: |
+        The input channel containing VCF files
+        Structure: [ val(meta), path(vcf) ]
+      pattern: "*.{vcf,vcf.gz}"
+  - ch_index:
+      type: file
+      description: |
+        The input channel containing VCF index files
+        Structure: [ val(meta), path(index) ]
+      pattern: "*.{tbi,csi}"
+  - ch_fasta:
+      type: file
+      description: |
+        Reference genome FASTA file used for normalization
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fna}"
+output:
+  - vcf:
+      type: file
+      description: |
+        Channel containing filtered VCF files with PASS variants only
+        Structure: [ val(meta), path(vcf) ]
+      pattern: "*.vcf.gz"
+  - index:
+      type: file
+      description: |
+        Channel containing index files for filtered VCFs
+        Structure: [ val(meta), path(index) ]
+      pattern: "*.{tbi,csi}"
+authors:
+  - "@avantonder"
+maintainers:
+  - "@avantonder"
