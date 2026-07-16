@@ -11,6 +11,7 @@ components:
   - minimap2_alignment
   - bam_sort_stats_samtools
   - clair3
+  - bcftools/index
   - bcftools/sort
   - vcf_filter
   - bcftools/stats
