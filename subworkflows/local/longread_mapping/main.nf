@@ -2,14 +2,14 @@
 // Perform long read mapping and variant calling
 //
 
-include { MINIMAP2_ALIGNMENT      } from '../minimap2_alignment/main'
-include { BAM_SORT_STATS_SAMTOOLS } from '../../nf-core/bam_sort_stats_samtools/main'
-include { CLAIR3                  } from '../../../modules/nf-core/clair3/main'
-include { BCFTOOLS_INDEX          } from '../../../modules/nf-core/bcftools/index/main'
-include { VCF_FILTER              } from '../vcf_filter/main'
-include { BCFTOOLS_STATS          } from '../../../modules/nf-core/bcftools/stats/main'
-include { CONSENSUS_BCFTOOLS      } from '../consensus_bcftools/main'
-include { SEQTK_COMP              } from '../../../modules/nf-core/seqtk/comp/main.nf'
+include { MINIMAP2_ALIGNMENT                        } from '../minimap2_alignment/main'
+include { BAM_SORT_STATS_SAMTOOLS                   } from '../../nf-core/bam_sort_stats_samtools/main'
+include { CLAIR3                                    } from '../../../modules/nf-core/clair3/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_LONGREAD } from '../../../modules/nf-core/bcftools/index/main'
+include { VCF_FILTER                                } from '../vcf_filter/main'
+include { BCFTOOLS_STATS                            } from '../../../modules/nf-core/bcftools/stats/main'
+include { CONSENSUS_BCFTOOLS                        } from '../consensus_bcftools/main'
+include { SEQTK_COMP                                } from '../../../modules/nf-core/seqtk/comp/main.nf'
 
 workflow LONGREAD_MAPPING {
 
@@ -38,9 +38,9 @@ workflow LONGREAD_MAPPING {
 
     CLAIR3 (ch_clair3_input, ch_fasta, ch_faidx)
 
-    BCFTOOLS_INDEX ( CLAIR3.out.vcf )
+    BCFTOOLS_INDEX_LONGREAD ( CLAIR3.out.vcf )
 
-    VCF_FILTER ( CLAIR3.out.vcf, BCFTOOLS_INDEX.out.index, ch_fasta )
+    VCF_FILTER ( CLAIR3.out.vcf, BCFTOOLS_INDEX_LONGREAD.out.index, ch_fasta )
 
     ch_bcftool_stats_input = VCF_FILTER.out.vcf.join(VCF_FILTER.out.index)
     BCFTOOLS_STATS ( ch_bcftool_stats_input, [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ], [ [:], [] ] )
