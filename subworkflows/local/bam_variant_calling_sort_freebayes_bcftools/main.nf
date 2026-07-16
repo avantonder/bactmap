@@ -1,6 +1,6 @@
-include { FREEBAYES      } from '../../../modules/nf-core/freebayes/main'
-include { BCFTOOLS_INDEX } from '../../../modules/nf-core/bcftools/index/main'
-include { BCFTOOLS_SORT  } from '../../../modules/nf-core/bcftools/sort/main'
+include { FREEBAYES                                  } from '../../../modules/nf-core/freebayes/main'
+include { BCFTOOLS_INDEX as BCFTOOLS_INDEX_SHORTREAD } from '../../../modules/nf-core/bcftools/index/main'
+
 
 workflow BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS {
 
@@ -16,13 +16,10 @@ workflow BAM_VARIANT_CALLING_SORT_FREEBAYES_BCFTOOLS {
     // Variant calling
     FREEBAYES ( ch_input, ch_fasta_fai.map{ meta, fasta, fai -> [ meta, fasta ] }, ch_fasta_fai.map{ meta, fasta, fai -> [ meta, fai ] }, ch_samples, ch_populations, ch_cnv )
 
-    // Sort VCF files
-    BCFTOOLS_SORT ( FREEBAYES.out.vcf )
-
     // Index VCF files
-    BCFTOOLS_INDEX ( BCFTOOLS_SORT.out.vcf )
+    BCFTOOLS_INDEX_SHORTREAD ( FREEBAYES.out.vcf )
 
     emit:
-    vcf      = BCFTOOLS_SORT.out.vcf           // channel: [ val(meta), path(vcf) ]
-    index    = BCFTOOLS_INDEX.out.index        // channel: [ val(meta), path(index) ]
+    vcf      = FREEBAYES.out.vcf                  // channel: [ val(meta), path(vcf) ]
+    index    = BCFTOOLS_INDEX_SHORTREAD.out.index // channel: [ val(meta), path(index) ]
 }
