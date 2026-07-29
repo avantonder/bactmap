@@ -307,7 +307,9 @@
                 },
                 "shortread_complexityfilter_tool": {
                     "type": "string",
-                    "default": "fastp"
+                    "default": "fastp",
+                    "description": "Specify which tool to use for complexity filtering",
+                    "fa_icon": "fas fa-hammer"
                 },
                 "shortread_qc_adapter2": {
                     "type": "string",
